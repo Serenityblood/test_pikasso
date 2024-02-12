@@ -1,5 +1,7 @@
 from django.db import transaction
 from rest_framework import status
+from rest_framework.generics import ListAPIView
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -15,6 +17,7 @@ class FileUploadView(APIView):
 
     @transaction.atomic
     def post(self, request):
+        """Создание нового файла"""
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -27,11 +30,14 @@ class FileUploadView(APIView):
         )
 
 
-class FileListView(APIView):
+class FileListView(ListAPIView):
+    queryset = File.objects.all()
     serializer_class = FileSerializer
+    pagination_class = PageNumberPagination
 
-    def get(self, request):
-        files = File.objects.all()
-        serializer = self.serializer_class(files, many=True)
+    def list(self, request):
+        """Выдача всех файлов"""
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 

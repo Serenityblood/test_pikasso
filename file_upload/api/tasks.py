@@ -8,6 +8,7 @@ logger = get_task_logger(__name__)
 
 @shared_task(name='file_handling')
 def file_handling(id):
+    """Обработка файла"""
     file = File.objects.get(id=id)
     logger.info(f'Starting to handle file {file}')
     file.processed = True

@@ -8,9 +8,16 @@ services:
       - postgres_data:/var/lib/postgresql/data/
     env_file:
       - file_upload/.env
+    healthcheck:
+      test: [ 'CMD-SHELL', 'pg_isready -U app -d careeroteka_db' ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:7-alpine
+    volumes:
+      - redis_data:/data
     depends_on:
       - db
 
@@ -19,10 +26,9 @@ services:
       context: ./
       dockerfile: Dockerfile
     command:
-      sh -c "python manage.py makemigrations api &&
-      python manage.py migrate api &&
-      python manage.py migrate &&
-      python manage.py runserver 0.0.0.0:8000"
+      sh -c "python manage.py collectstatic --noinput &&
+             python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
     ports:
       - 8000:8000
     env_file:
@@ -31,9 +37,11 @@ services:
       - db
       - redis
     volumes:
+      - static_volume:/usr/src/app/static/
       - media_volume:/usr/src/app/media/
 
   celery_worker:
+    restart: always
     build:
       context: ./
       dockerfile: Dockerfile
@@ -47,4 +55,6 @@ services:
 
 volumes:
   postgres_data:
+  redis_data:
+  static_volume:
   media_volume:

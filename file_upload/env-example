@@ -1,0 +1,9 @@
+SECRET_KEY='django-insecure-+e0-+!s3l55^7+ps&8==um4)_s^th@(=f)+-h&#9z5dj$*jig6'
+DEBUG=False
+DB_NAME=postgres
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+DB_HOST=db
+DB_PORT=5432
+CELERY_BROKER_URL=redis://redis:6379
+CELERY_RESULT_BACKEND=redis://redis:6379
